@@ -1,5 +1,5 @@
 import os
-# Suppress TensorFlow log messages
+# Suppress TensorFlow informational and warning messages, only errors will be printed.
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import tensorflow as tf
