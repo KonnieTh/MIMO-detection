@@ -101,9 +101,8 @@ class DetNetModel(tf.keras.Model):
             # Pass the concatenated input through the i-th Dense layer.
             xhat = self.unfold_layers[i](concat_input)
             # Apply the custom nonlinearity:
-            # f(x) = -1 + ReLU(x + t)/|t| - ReLU(x - t)/|t|
-            t_abs = tf.abs(self.t) + 1e-8  # Avoid division by zero
-            xhat = -1.0 + tf.nn.relu(xhat + self.t) / t_abs - tf.nn.relu(xhat - self.t) / t_abs
+            xhat = tf.math.tanh(self.t * xhat)
+
         
         # Return the final estimate and also the second element (loss) is None because we are in inference mode.
         return xhat, None
@@ -114,7 +113,7 @@ class DetNetModel(tf.keras.Model):
 
 def main():
     detnet = tf.keras.models.load_model(
-        "detnet_qpsk_relu.keras",
+        "detnet_qpsk_tanh.keras",
         custom_objects={'DetNetModel': DetNetModel},
         compile=False
     )

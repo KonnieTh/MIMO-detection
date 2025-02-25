@@ -6,6 +6,8 @@ import tensorflow as tf
 import numpy as np
 from sionna.mapping import Mapper, Constellation
 
+
+
 # Set random seeds
 tf.random.set_seed(42)
 np.random.seed(42)
@@ -160,7 +162,7 @@ def main():
     # Define the number of complex antennas and modulation bits.
     Nt_complex = 4  # Number of complex transmit antennas
     Nr_complex = 8  # Number of complex receive antennas
-    num_bits = 2    # Bits per symbol (QPSK uses 2 bits per symbol)
+    num_bits = 4    # Bits per symbol
     
     # Training parameters
     num_epochs = 50
@@ -254,8 +256,8 @@ def main():
         print(f"Epoch {epoch+1}/{num_epochs} | Loss: {epoch_loss/steps_per_epoch:.6f}")
     
     # Save the trained model in the Keras native format.
-    detnet.save("detnet_qpsk_relu.keras")
-    print("Model saved as detnet_qpsk_relu.keras")
+    detnet.save("detnet_16qam_relu.keras")
+    print("Model saved as detnet_16qam_relu.keras")
 
 if __name__ == "__main__":
     main()

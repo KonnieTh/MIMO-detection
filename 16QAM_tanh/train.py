@@ -6,6 +6,8 @@ import tensorflow as tf
 import numpy as np
 from sionna.mapping import Mapper, Constellation
 
+
+
 # Set random seeds
 tf.random.set_seed(42)
 np.random.seed(42)
@@ -107,9 +109,7 @@ class DetNetModel(tf.keras.Model):
             # Pass the concatenated input through a dense layer.
             xhat = self.unfold_layers[i](concat_input)
             # Apply the custom nonlinearity:
-            #    f(x) = -1 + ReLU(x+t)/|t| - ReLU(x-t)/|t|
-            t_abs = tf.abs(self.t) + 1e-8  # Add epsilon to avoid division by zero
-            xhat = -1.0 + tf.nn.relu(xhat + self.t) / t_abs - tf.nn.relu(xhat - self.t) / t_abs
+            xhat = tf.math.tanh(self.t * xhat)
             # Save the output of the current iteration (layer)
             xhat_list.append(xhat)
         
@@ -160,7 +160,7 @@ def main():
     # Define the number of complex antennas and modulation bits.
     Nt_complex = 4  # Number of complex transmit antennas
     Nr_complex = 8  # Number of complex receive antennas
-    num_bits = 2    # Bits per symbol (QPSK uses 2 bits per symbol)
+    num_bits = 4    # Bits per symbol
     
     # Training parameters
     num_epochs = 50
@@ -254,8 +254,8 @@ def main():
         print(f"Epoch {epoch+1}/{num_epochs} | Loss: {epoch_loss/steps_per_epoch:.6f}")
     
     # Save the trained model in the Keras native format.
-    detnet.save("detnet_qpsk_relu.keras")
-    print("Model saved as detnet_qpsk_relu.keras")
+    detnet.save("detnet_16qam_tanh.keras")
+    print("Model saved as detnet_16qam_tanh.keras")
 
 if __name__ == "__main__":
     main()

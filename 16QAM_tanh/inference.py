@@ -101,9 +101,8 @@ class DetNetModel(tf.keras.Model):
             # Pass the concatenated input through the i-th Dense layer.
             xhat = self.unfold_layers[i](concat_input)
             # Apply the custom nonlinearity:
-            # f(x) = -1 + ReLU(x + t)/|t| - ReLU(x - t)/|t|
-            t_abs = tf.abs(self.t) + 1e-8  # Avoid division by zero
-            xhat = -1.0 + tf.nn.relu(xhat + self.t) / t_abs - tf.nn.relu(xhat - self.t) / t_abs
+            xhat = tf.math.tanh(self.t * xhat)
+
         
         # Return the final estimate and also the second element (loss) is None because we are in inference mode.
         return xhat, None
@@ -114,7 +113,7 @@ class DetNetModel(tf.keras.Model):
 
 def main():
     detnet = tf.keras.models.load_model(
-        "detnet_qpsk_relu.keras",
+        "detnet_16qam_tanh.keras",
         custom_objects={'DetNetModel': DetNetModel},
         compile=False
     )
@@ -122,7 +121,7 @@ def main():
     # System Parameters (must match training parameters)
     Nt_complex = 4     # Number of complex transmit antennas
     Nr_complex = 8     # Number of complex receive antennas
-    num_bits = 2       # Bits per modulation symbol (QPSK)
+    num_bits = 4       # Bits per modulation symbol
     eval_batch_size = 100000  # Number of samples per evaluation batch
 
     # Mapper: Converts bits into complex modulation symbols.
@@ -137,9 +136,9 @@ def main():
                                  maxval=2, dtype=tf.int32)
         # Map the bits to complex modulation symbols.
         x = mapper(bits)
-        # Remove any extra dimensions
+        # Remove any extra dimensions and normalize the energy of the symbols.
         x = tf.squeeze(x, -1)
-
+        
         # Create a random complex channel matrix H for each sample.
         H = tf.complex(
             tf.random.normal([eval_batch_size, Nr_complex, Nt_complex], dtype=tf.float32),
@@ -202,7 +201,7 @@ def main():
     plt.semilogy(snr_values, ber_vals, 'o-')
     plt.xlabel("SNR (dB)")
     plt.ylabel("Bit Error Rate")
-    plt.title("4x8 MIMO QPSK Detection Performance")
+    plt.title("4x8 MIMO 16QAM Detection Performance")
     plt.grid(True)
     plt.show()
     

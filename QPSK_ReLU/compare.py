@@ -119,7 +119,7 @@ demapper = Demapper("app", "qam", num_bits_per_symbol=num_bits)
 
 # Load the pre-trained DetNet model from file.
 detnet = tf.keras.models.load_model(
-    "detnet_qpsk.keras",
+    "detnet_qpsk_relu.keras",
     custom_objects={'DetNetModel': DetNetModel},
     compile=False
 )
@@ -130,8 +130,8 @@ def simulate_ber_detnet_for_snr(snr_db):
     bits = tf.random.uniform([eval_batch_size, Nt_complex, num_bits],
                                maxval=2, dtype=tf.int32)
     x_complex = mapper(bits)
-    # Normalize symbols (divide by sqrt(2)) and remove any extra dimensions.
-    x_complex = tf.squeeze(x_complex, -1) / tf.complex(tf.sqrt(2.0), 0.0)
+    # remove any extra dimensions.
+    x_complex = tf.squeeze(x_complex, -1)
     
     # 2) Generate a random complex channel matrix.
     H = tf.complex(
