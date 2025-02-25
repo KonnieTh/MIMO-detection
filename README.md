@@ -4,13 +4,18 @@ This repository implements a deep MIMO detector using a neural network architect
 
 **Activations**:
 
-- **tanh** (standard activation):  
-  \(\displaystyle \tanh(t \cdot x)\)  
-  where \(t\) is trainable.
+- **tanh** (standard activation):
 
-- **custom ReLU**, defined as:  
-  \(\displaystyle f(x) = -1 + \frac{\operatorname{ReLU}(x + t)}{\lvert t \rvert} \;-\; \frac{\operatorname{ReLU}(x - t)}{\lvert t \rvert}\)  
-  where \(t\) is trainable.
+  `tanh(t * x)`
+
+  where `t` is trainable.
+
+- **custom ReLU**, defined as:
+
+  `f(x) = -1 + ReLU(x + t)/|t| - ReLU(x - t)/|t|`
+
+  where `t` is trainable.
+
 
 
 The following results show the Bit Error Rate (BER) performance across a range of SNR values for QPSK and 16QAM modulation schemes.
